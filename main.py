@@ -5,10 +5,16 @@ pygame.init()
 
 # Set the screen size and constants
 size = WIDTH, HEIGHT = 1000, 700
-GRAVITY = 9.81
-VELOCITY = 100
+GRAVITY = -9.81
+velocity = 0
 speed_tank = 5
 MAX_HEIGHT = 200
+theta = 0
+run = True
+bullet_fired = False
+time = 0
+x = 0
+y = 0
 
 # Initialise the screen
 screen = pygame.display.set_mode(size)
@@ -27,48 +33,44 @@ target_rect = target.get_rect(bottomright=(1000, 7 * HEIGHT // 9))
 # Load ammunition image
 ammunition = pygame.image.load("assets/ammunition.png").convert_alpha()
 ammunition = pygame.transform.scale(ammunition, (40, 40))
-ammunition_rect = ammunition.get_rect(bottomleft=(tank_rect.midright))
 
 # Load background image
 background = pygame.image.load("assets/background.jpg").convert()
 background = pygame.transform.scale(background, size)
 
 
-"""class Canon(pygame.sprite.Sprite):
-    def __init__(self, x, y, image):
+class Ammunition(pygame.sprite.Sprite):
+    def __init__(self, image):
         super().__init__()
         self.image = image
         self.rect = self.image.get_rect()
-        self.rect.center = (x, y)
-        self.velocity = [0, 0]
-        self.start_pos = (0, 0)
-
 
     def update(self):
         self.rect.x += self.velocity[0]
         self.rect.y += self.velocity[1]
 
+    @staticmethod
+    def path(startx, starty, velocity, ang, time):
+        velx = math.cos(ang) * velocity
+        vely = math.sin(ang) * velocity
+
+        distX = velx * time
+        distY = (vely * time) + ((-9.81 * (time)**2)/2)
+
+        newx = round(distX + startx)
+        newy = round(starty - distY)
+
+        return (newx, newy)
     
-    def shoot(self):
-        # Release the ball
-        mouse_pos = pygame.mouse.get_pos()
-        direction = math.atan2(self.start_pos[1] - mouse_pos[1], self.start_pos[0] - mouse_pos[0])
-        speed = 10
-        self.velocity = [speed * math.cos(direction), speed * math.sin(direction)]"""
 
-run = True
-bullet_fired = False
-time_elapsed = 0
-
-while run:
-    pygame.time.Clock().tick(30)
-    delta_time = 1 / 30
-
+def redrawWindow():
     screen.blit(background, (0, 0))
     screen.blit(tank, tank_rect)
     screen.blit(target, target_rect)
-    mouse_pos = pygame.mouse.get_pos()
+    pygame.display.update()
 
+
+def draw_line(mouse_pos, start_pos=tank_rect.midright):
     dx = mouse_pos[0] - tank_rect.midright[0]
     dy = mouse_pos[1] - tank_rect.midright[1]
 
@@ -78,10 +80,56 @@ while run:
         scale = MAX_HEIGHT / distance
         end_x = tank_rect.midright[0] + dx * scale
         end_y = tank_rect.midright[1] + dy * scale
-        pygame.draw.line(screen, (255, 0, 0), tank_rect.midright, (end_x, end_y), 2)
+        pygame.draw.line(screen, (255, 0, 0), start_pos, (end_x, end_y), 2)
     
     else:
-        pygame.draw.line(screen, (255, 0, 0), tank_rect.midright, mouse_pos, 2)
+        pygame.draw.line(screen, (255, 0, 0), start_pos, mouse_pos, 2)
+
+    return (end_x, end_y)
+
+
+def findAngle(pos):
+    sX = ammunition.x
+    sY = ammunition.y
+
+    try:
+        angle = math.atan((sY - pos[1]) / (sX - pos[0]))
+    except:
+        angle = math.pi / 2
+
+    if pos[1] < sY and pos[0] > sX:
+        angle = abs(angle)
+
+    elif pos[1] < sY and pos[0] < sX:
+        angle = math.pi - angle
+
+    elif pos[1] > sY and pos[0] < sX:
+        angle = math.pi + abs(angle)
+
+    else:
+        angle = (math.pi * 2) - angle
+    
+    return angle
+        
+
+ammunition = Ammunition(bottomleft=(tank_rect.midright))
+
+while run:
+    pygame.time.Clock().tick(30)
+
+    if shoot:
+        if ammunition.rect.y < 700 - HEIGHT:
+            time += 0.05
+            po = ammunition.path(x, y, velocity, theta, time)
+            ammunition.rect.x = po[0]
+            ammunition.rect.y = po[1]
+        else:
+            shoot = False
+            ammunition.rect.bottomleft = tank_rect.midright
+
+    mouse_pos = pygame.mouse.get_pos()
+    line = draw_line(mouse_pos)
+    redrawWindow()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -97,21 +145,11 @@ while run:
 
     if keys_pressed[pygame.K_SPACE] and not bullet_fired:
         bullet_fired = True
-        bullet_start_pos = ammunition_rect.center
-        theta = math.atan2(bullet_start_pos[1] - mouse_pos[1], bullet_start_pos[0] - mouse_pos[0])
-        print(math.degrees(theta))
-        time_elapsed = 0
-        
-    if bullet_fired:
-        time_elapsed += delta_time
-        ammunition_rect.x += int(VELOCITY * math.cos(theta) * time_elapsed)
-        ammunition_rect.y = -int(bullet_start_pos[1] - (VELOCITY * math.sin(theta) * time_elapsed) + (0.5 * GRAVITY * time_elapsed**2))
-        screen.blit(ammunition, ammunition_rect)
-     
-    # Reset bullet if it goes out of bounds
-    if ammunition_rect.y > HEIGHT or ammunition_rect.x > WIDTH:
-        ammunition_rect.bottomleft = tank_rect.midright
-        bullet_fired = False
+        x = ammunition.rect.x
+        y = ammunition.rect.y
+        time = 0
+        power = 20
+        theta = findAngle(mouse_pos)
 
     pygame.display.update()
 
