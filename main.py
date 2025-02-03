@@ -156,6 +156,7 @@ while run:
             time = 0
             ammunition_object.rect.bottomleft = tank_rect.midright
 
+    line = pygame.draw.line(screen, (0, 0, 0), WIDTH/5, 0, 1)
     redrawWindow()
     draw_line(pygame.mouse.get_pos())
     
@@ -167,7 +168,7 @@ while run:
 
     keys_pressed = pygame.key.get_pressed()
 
-    if keys_pressed[pygame.K_LEFT] and tank_rect.x > 0:
+    if keys_pressed[pygame.K_LEFT] and 0 < tank_rect.x < line:
         tank_rect.x -= speed_tank 
 
     if keys_pressed[pygame.K_RIGHT]:
