@@ -1,5 +1,6 @@
 import customtkinter as ctk
-import Tank_game
+
+
 from PIL import Image
 import sqlite3
 
@@ -8,8 +9,9 @@ import sqlite3
 connection = sqlite3.connect("Database.db")
 
 cursor = connection.cursor()
-def level(username):
+def level_page(username):
     print("game is now running...")
+    print(username)
     cursor.execute(f"SELECT * FROM Users WHERE username == '{username}'")
     details = cursor.fetchall()
     details = details[0]
@@ -22,7 +24,8 @@ def level(username):
     def lvl_checker(level,user_level):
       
       if user_level >= level :
-          print(level)
+          print('level:', level)
+          main.destroy()
       else:
           error_label = ctk.CTkLabel(main,text = "USER DOES NOT MEET LEVEL REQUIRED",text_color= "#e32619",fg_color="#ADD8E6")
           error_label.place(relx = 0.42,rely = 0.9)
@@ -32,7 +35,7 @@ def level(username):
 
     def initialize_main_window():
         main = ctk.CTk()
-        main.title("QuizPro: Learn, Track, and Improve!")
+        main.title("Cannon game - Levels")
 
         # Calculate window size based on screen
         screen_width = main.winfo_screenwidth()
@@ -88,10 +91,8 @@ def level(username):
 
 
 
-    if __name__ == "__main__":
-        main = initialize_main_window()
-        main_screen(main)
-        main.mainloop()
-
-level('Test')
+    
+    main = initialize_main_window()
+    main_screen(main)
+    main.mainloop()
 

@@ -1,7 +1,7 @@
 import sqlite3
 from tkinter import *
 from functools import partial
-from game import game
+from Levels import *
 
 
 connection = sqlite3.connect("Database.db")
@@ -37,8 +37,9 @@ def main_login_page():
                     print("******* Login *******")
                     print("Username entered :", username)
                     print("Password entered :", password)
-                    game(username)
                     root.destroy()
+                    level_page(username)
+                    
                 else:
                     alert_banner_Login.config(text="Wrong username or password")
                     
