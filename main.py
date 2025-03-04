@@ -6,7 +6,7 @@ pygame.init()
 
 # Set the screen size and constants
 size = WIDTH, HEIGHT = 1000, 700
-GRAVITY = -4.9
+GRAVITY = -9.8
 speed_tank = 2
 MAX_HEIGHT = 200
 power = 50
@@ -17,7 +17,7 @@ time = 0
 x = 0
 y = 0
 ammunition_left = 3
-level = 0
+level = 1
 bird_start_position = (0, random.randint(100, HEIGHT // 3))
 win = False
 hit_bird = False
@@ -67,9 +67,10 @@ background = pygame.transform.scale(background, size)
 game_over = pygame.image.load("assets/game_over.png")
 game_over = pygame.transform.scale(game_over, (200, 200))
 
-# Load sound effects
-
-
+l = pygame.mixer.music.load("assets/Sound/background_music.mp3")
+l = pygame.mixer.music.set_volume(0.5)
+l = pygame.mixer.music.play(-1)
+   
 
 class Ammunition(pygame.sprite.Sprite):
     def __init__(self, image):
@@ -128,13 +129,16 @@ class Target(pygame.sprite.Sprite):
         self.target_mask = pygame.mask.from_surface(target)
         self.mask_image = self.target_mask.to_surface()
 
+        self.start_x = self.rect.x  # Store the initial x position
+        self.time_counter = 0   
+
 
 def redrawWindow():
     if game_over_state:
         screen.fill((0, 0, 128))
         screen.blit(game_over, (WIDTH//2.5, HEIGHT//3))
         target_object.rect.bottomright = (WIDTH/1.1, 7 * HEIGHT // 8.8)
-    
+        
     else:
         screen.blit(background, (0, 0))
         screen.blit(tank, tank_rect)
@@ -155,10 +159,10 @@ def redrawWindow():
         if shoot and not hit and not hit_bird:
             screen.blit(ammunition_object.image, ammunition_object.rect)
 
-        if level == 2:
+        if level == 3:
             screen.blit(bird.image, bird.rect)
 
-        if level == 3:
+        if level == 4:
             screen.blit(bird.image, bird.rect)
             screen.blit(bird1.image, bird1.rect)
             screen.blit(bird2.image, bird2.rect)
@@ -209,16 +213,27 @@ def findAngle(pos):
 
     return angle
 
+
 def move_object(start, object, vel):
-    if object.rect.y <= 0 or object.rect.y >= start:
-        vel = -vel
-    object.rect.y += vel
+    if level == 5:
+        object.time_counter += 0.05  
+        amplitude = 100            
+        object.rect.x = object.start_x + amplitude * math.sin(object.time_counter)
+
+    else:
+        if object.rect.y <= 0 or object.rect.y >= start:
+            vel = -vel
+        object.rect.y += vel
+
     return vel
 
+
 def randomise_y(bird, bird_objects):
-    new_y = random.choice(range(100, HEIGHT // 2, 10))
+    new_y = random.choice(range(100, HEIGHT // 2, 40))
+
     while new_y in [b.rect.y for b in bird_objects]:
         new_y = random.choice(range(100, HEIGHT // 2, 40))
+
     bird.rect.y = new_y
 
 
@@ -244,10 +259,10 @@ start_pos = target_object.rect.y
 while run:
     pygame.time.Clock().tick(200)
 
-    if level == 1:
+    if level == 2:
         vel = move_object(start_pos, target_object, vel)
 
-    if level == 2:
+    if level == 3:
         vel = move_object(start_pos, target_object, vel)
         bird_update([bird])
 
@@ -260,10 +275,10 @@ while run:
 
         # bird.update()
 
-    if level == 3:
+    if level == 4:
         vel = move_object(start_pos, target_object, vel)
         bird_update([bird, bird1, bird2])
-        
+
 
     if shoot:
         if 0 - ammunition_object.get_height() < ammunition_object.rect.y < HEIGHT and 0 < ammunition_object.rect.x < WIDTH + ammunition_object.get_height():
@@ -278,11 +293,9 @@ while run:
                 offset_x = bird_obj.rect.x - ammunition_object.rect.x
                 offset_y = bird_obj.rect.y - ammunition_object.rect.y
         
-
                 if ammunition_object.ammunition_mask.overlap(bird_obj.bird_mask, (offset_x, offset_y)) and not hit_bird:
                     hit_bird = True
                     ammunition_object.rect.bottomleft = tank_rect.midright
-
 
             offset_x = target_object.rect.x - ammunition_object.rect.x
             offset_y = target_object.rect.y - ammunition_object.rect.y
@@ -292,7 +305,6 @@ while run:
                 level += 1
                 vel = (2**level)
                 ammunition_left = 3
-
         else:
             shoot = False
             time = 0
@@ -323,7 +335,12 @@ while run:
     if keys_pressed[pygame.K_r] and game_over_state:
         game_over_state = False
         ammunition_left = 3
-        level = 0
+        level = 1
+
+        pygame.mixer.music.stop()
+        pygame.mixer.music.load("assets/Sound/background_music.mp3")
+        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.play(-1)
 
     if keys_pressed[pygame.K_SPACE] and not shoot and ammunition_left > 0:
         shoot = True
