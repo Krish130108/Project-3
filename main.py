@@ -1,5 +1,6 @@
 import pygame, math, random
 import tkinter as tk
+from Login import *
 
 # Initialize the game
 pygame.init()
@@ -13,13 +14,13 @@ power = 50
 angle = 0
 run = True
 shoot = False
+win = False
 time = 0
 x = 0
 y = 0
 ammunition_left = 3
 level = 1
 bird_start_position = (0, random.randint(100, HEIGHT // 3))
-win = False
 hit_bird = False
 game_over_state = False
 
@@ -67,10 +68,14 @@ background = pygame.transform.scale(background, size)
 game_over = pygame.image.load("assets/game_over.png")
 game_over = pygame.transform.scale(game_over, (200, 200))
 
+# Load win image
+win_image = pygame.image.load("assets/win_image.jpg")
+win_image = pygame.transform.scale(win_image, (200, 200))
+
 l = pygame.mixer.music.load("assets/Sound/background_music.mp3")
 l = pygame.mixer.music.set_volume(0.5)
 l = pygame.mixer.music.play(-1)
-   
+
 
 class Ammunition(pygame.sprite.Sprite):
     def __init__(self, image):
@@ -79,7 +84,6 @@ class Ammunition(pygame.sprite.Sprite):
         self.rect.bottomleft = tank_rect.midright
         self.ammunition_mask = pygame.mask.from_surface(ammunition)
         self.mask_image = self.ammunition_mask.to_surface()
-
 
     @staticmethod
     def path(startx, starty, velocity, ang, time):
@@ -133,7 +137,7 @@ class Target(pygame.sprite.Sprite):
         self.time_counter = 0   
 
 
-def redrawWindow():
+def redrawWindow(game_over_state):
     if game_over_state:
         screen.fill((0, 0, 128))
         screen.blit(game_over, (WIDTH//2.5, HEIGHT//3))
@@ -166,7 +170,17 @@ def redrawWindow():
             screen.blit(bird.image, bird.rect)
             screen.blit(bird1.image, bird1.rect)
             screen.blit(bird2.image, bird2.rect)
-           
+
+        if level == 5:
+            global win
+            win = True
+            screen.fill((0, 0, 0))
+            screen.blit(win_image, (WIDTH//2.5, HEIGHT//2.5))
+            font3 = pygame.font.Font("assets/fonts/Montserrat.ttf", 30)
+            text3 = font3.render(f"Press R to restart", True, (0, 0, 255))
+            screen.blit(text3, (0, 0))
+            game_over_state = True
+        
     pygame.display.update()
 
 
@@ -255,6 +269,7 @@ bird1 = Bird()
 bird2 = Bird()
 target_object = Target(target)
 start_pos = target_object.rect.y
+vel = (2**level)
 
 while run:
     pygame.time.Clock().tick(200)
@@ -315,7 +330,7 @@ while run:
             if ammunition_left == 0 and not shoot:
                 game_over_state = True
 
-    redrawWindow()
+    redrawWindow(game_over_state)
     draw_line(pygame.mouse.get_pos())    
     
     for event in pygame.event.get():
@@ -335,7 +350,7 @@ while run:
     if keys_pressed[pygame.K_r] and game_over_state:
         game_over_state = False
         ammunition_left = 3
-        level = 1
+        level = level
 
         pygame.mixer.music.stop()
         pygame.mixer.music.load("assets/Sound/background_music.mp3")

@@ -19,7 +19,6 @@ root.configure(background="white")
 
 def main_login_page():
     def user_credential_Login(username, password):
-
         username = username.get()
         password = password.get()
 
@@ -41,8 +40,7 @@ def main_login_page():
                     level_page(username)
                     
                 else:
-                    alert_banner_Login.config(text="Wrong username or password")
-                    
+                    alert_banner_Login.config(text="Wrong username or password")                    
             else:
                 alert_banner_Login.config(text="Wrong username or password")
         else:
@@ -52,8 +50,7 @@ def main_login_page():
     def check_if_user_exist(username):
             cursor.execute(f"SELECT * FROM Users WHERE username == '{username}'")
             found = cursor.fetchall()
-            if len(found) == 1:
-                
+            if len(found) == 1:                  
                 return True
             else:
                 return False
@@ -111,15 +108,12 @@ def main_login_page():
 
             
         def user_credential_sign_up(name, username, password):
-            
-
             name = name.get()
             username = username.get()
             password = password.get()
             level = 1
 
             error = False
-            
             
             if len(name) <= 2:
                 alert_banner_sign_up.config(text="Enter your name")
@@ -139,7 +133,6 @@ def main_login_page():
                 print("name entered :", name)
                 print("username entered :", username)
                 print("password entered :", password)
-
 
                 cursor.execute(f"INSERT INTO Users VALUES ('{username}' , '{name}' , '{password}', '{level}' )")
                 connection.commit()

@@ -1,14 +1,12 @@
 import customtkinter as ctk
-
-
 from PIL import Image
 import sqlite3
-
-
+import os 
 
 connection = sqlite3.connect("Database.db")
 
 cursor = connection.cursor()
+
 def level_page(username):
     print("game is now running...")
     print(username)
@@ -17,15 +15,16 @@ def level_page(username):
     details = details[0]
 
     username = details[0]
-    name = details[1]
     user_level = details[3]
 
 
-    def lvl_checker(level,user_level):
+    def lvl_checker(level, user_level):
       
       if user_level >= level :
           print('level:', level)
           main.destroy()
+          os.system("python main.py")        
+
       else:
           error_label = ctk.CTkLabel(main,text = "USER DOES NOT MEET LEVEL REQUIRED",text_color= "#e32619",fg_color="#ADD8E6")
           error_label.place(relx = 0.42,rely = 0.9)
@@ -65,11 +64,11 @@ def level_page(username):
         #lvl = ctk.StringVar(value = "1")
         
 
-        lvl_background = ctk.CTkImage(light_image = Image.open('Images/sky.png'),dark_image =Image.open('Images/sky.png'),size = (window_width*2,window_height*2))
+        lvl_background = ctk.CTkImage(light_image = Image.open('assets/sky.png'),dark_image = Image.open('assets/sky.png'),size = (window_width*2,window_height*2))
         lvl_label = ctk.CTkLabel(main,text = "",image = lvl_background)
         lvl_label.place(relx= 0,rely = 0)
 
-        title = ctk.CTkImage(light_image= Image.open('Images/Canon_title.png'),dark_image = Image.open('Images/Canon_title.png'),size = (window_width*0.3,window_height*0.4) )
+        title = ctk.CTkImage(light_image= Image.open('assets/Canon_title.png'),dark_image = Image.open('assets/Canon_title.png'),size = (window_width*0.3,window_height*0.4) )
         title_label = ctk.CTkLabel(main,image = title)
         title_label.place(relx = 0.42, rely = 0.10)
 
@@ -88,8 +87,6 @@ def level_page(username):
         
         #, variable = lvl
         #,value = "1"  
-
-
 
     
     main = initialize_main_window()
