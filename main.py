@@ -1,10 +1,8 @@
-import pygame, math, random
+import pygame, math, random, sqlite3
 import tkinter as tk
-from Login import get_username
-import sqlite3
+from Login import getuser
 
 connection = sqlite3.connect("Database.db")
-
 cursor = connection.cursor()
 
 # Initialize the game
@@ -355,8 +353,12 @@ while run:
     if keys_pressed[pygame.K_r] and game_over_state:
         game_over_state = False
         ammunition_left = 3
-        level = cursor.execute(f"UPDATE Users SET level = '{level}' WHERE username == '{Login.found}'")
+        cursor.execute(f"UPDATE Users SET level = '{level}' WHERE username == '{getuser()}'")
         connection.commit()
+
+        cursor.execute("SELECT level FROM Users WHERE username = ?", (getuser(),))
+        level_from_db = cursor.fetchone()[0]
+        level = level_from_db
 
         pygame.mixer.music.stop()
         pygame.mixer.music.load("assets/Sound/background_music.mp3")
