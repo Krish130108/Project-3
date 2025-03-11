@@ -153,8 +153,6 @@ def main_login_page():
         nameEntry_sign_up = Entry(root, textvariable=name, bg="white", fg='green', insertbackground="green")
         nameEntry_sign_up.place(x=100,y=42) 
 
-        
-
         usernameLabel_sign_up = Label(root, text="Username *", bg="white", fg='green')
         usernameLabel_sign_up.place(x=20,y=80)
         username = StringVar()
@@ -172,11 +170,8 @@ def main_login_page():
         signUpButton_sign_up = Button(root, text="Sign up", width=8, height=1, bg="white", fg='green', padx=0, pady=0, command=user_credential_sign_up)
         signUpButton_sign_up.place(x=105,y=170)
 
-
-
         loginButton_sign_up = Button(root, text="Login", width=5, height=1, bg="white", fg='green', padx=0, pady=0, command=go_to_main_login_page)
         loginButton_sign_up.place(x=210,y=170)
-
 
     root.title("Cannon Game - Login")  
 

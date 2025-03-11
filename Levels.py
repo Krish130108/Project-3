@@ -17,7 +17,6 @@ def level_page(username):
     username = details[0]
     user_level = details[3]
 
-
     def lvl_checker(level, user_level):
       
       if user_level >= level :
@@ -43,7 +42,6 @@ def level_page(username):
         window_height = int(screen_height * 0.5)
         main.geometry(f"{window_width}x{window_height}")
         
-
         # Set appearance and theme
         ctk.set_appearance_mode("system")
         ctk.set_default_color_theme("green")
@@ -63,7 +61,6 @@ def level_page(username):
         window_height = int(screen_height * 0.5)
         #lvl = ctk.StringVar(value = "1")
         
-
         lvl_background = ctk.CTkImage(light_image = Image.open('assets/sky.png'),dark_image = Image.open('assets/sky.png'),size = (window_width*2,window_height*2))
         lvl_label = ctk.CTkLabel(main,text = "",image = lvl_background)
         lvl_label.place(relx= 0,rely = 0)
@@ -72,7 +69,6 @@ def level_page(username):
         title_label = ctk.CTkLabel(main,image = title)
         title_label.place(relx = 0.42, rely = 0.10)
 
-    
         button_lvl_1 = ctk.CTkButton(main, text="LEVEL 1", font=("Arial", 16), fg_color = "#ADD8E6",hover_color = "#43e8d8",command = lambda:lvl_checker(1,user_level))
         button_lvl_1.place(relx=0.5, rely=0.4, anchor="center")
 
@@ -87,7 +83,6 @@ def level_page(username):
         
         #, variable = lvl
         #,value = "1"  
-
     
     main = initialize_main_window()
     main_screen(main)
